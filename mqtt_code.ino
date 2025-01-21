@@ -9,6 +9,8 @@ const char* password = "houda12345";
 const char* mqtt_server = "test.mosquitto.org";
 const char* humidity_topic = "sensor/humidity";
 const char* temperature_topic = "sensor/temperature";
+const char* moisture_topic = "sensor/moisture";
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -63,6 +65,7 @@ void loop() {
         // Parse temperature and humidity from the received string
         float temperature = parseValue(received, "Temperature:");
         float humidity = parseValue(received, "Humidity:");
+        float moisture = parseValue(received, "Moisture:");
 
         // Ensure valid temperature and humidity before publishing
         if (!isnan(temperature)) {
@@ -81,6 +84,16 @@ void loop() {
             Serial.println("Sent to MQTT (humidity): " + String(humBuffer));
         } else {
             Serial.println("Error: Humidity is NaN, skipping MQTT publish");
+        }
+
+        
+        if (!isnan(moisture)) {
+            char moistureBuffer[8];
+            dtostrf(humidity, 4, 2, moistureBuffer);
+            client.publish(moisture_topic, moistureBuffer);
+            Serial.println("Sent to MQTT (moisture): " + String(moistureBuffer));
+        } else {
+            Serial.println("Error: moistureBuffer is NaN, skipping MQTT publish");
         }
     }
 
